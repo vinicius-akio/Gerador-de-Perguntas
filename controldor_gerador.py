@@ -1,14 +1,39 @@
 from fastapi import APIRouter
 from gerador import Gerador
+from sqlalchemy import create_engine, text
 import requests
 import json
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+DATABASE_URL = os.getenv('DATABASE_URL')
+apikey = os.getenv("GEMINI_API_KEY")
 
 router = APIRouter(prefix="/gerador", tags=["Gerador"])
 
 @router.post("/")
 def gerar_questoes(gerador: Gerador):
 
-    apikey =
+    engine = create_engine(DATABASE_URL)
+
+    try:
+        with engine.begin() as con:
+            sql = """
+                INSERT INTO public.respostas (texto)
+                VALUES ( :texto)
+                  """ 
+                       
+            dados = {
+                "texto" : gerador.requisicao
+            }
+
+            con.execute(text(sql), dados)
+
+            engine.dispose()
+
+    except Exception as e:
+        return e
 
     tema = gerador.requisicao
 
